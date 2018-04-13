@@ -8,7 +8,7 @@ import java.io.StringReader;
 public class Test {
 
 	public static void main(String[] args) throws IOException {
-		Reader r = new StringReader("/*abc*/if(x == 7);//oi");
+		Reader r = new StringReader("/*abc*/if(x == 7 + 5) ;//oi");
 		StreamTokenizer st = new StreamTokenizer(r);
 		st.slashSlashComments(true);
 		st.slashStarComments(true);
@@ -17,33 +17,30 @@ public class Test {
 		while (currentToken != StreamTokenizer.TT_EOF) {
 			switch (currentToken) {
 			case StreamTokenizer.TT_NUMBER:
-				double num = st.nval;
-				System.out.println("Number found: " + num);
+				System.out.printf("[num, %s]\n", st.nval);
 				break;
 			case StreamTokenizer.TT_WORD:
 				String word = st.sval;
-				System.out.println("Word found: " + word);
+				System.out.printf("[string_literal, %s]\n", word);
 				break;
 			case '+':
-				break;
 			case '-':
-				break;
 			case '/':
-				break;
 			case '*':
+				System.out.printf("[Arith_Op, %c]\n", currentToken);
 				break;
 			case '<': {
 				int t = st.nextToken();
 				switch (t) {
 				case '=':
-					System.out.println("<=");
+					printOperator("<=");
 					break;
 				case '<':
-					System.out.println("<<");
+					printOperator("<<");
 					break;
 				default:
 					st.pushBack();
-					System.out.println("<");
+					printOperator("<");
 					break;
 				}
 			}
@@ -51,11 +48,11 @@ public class Test {
 				int t = st.nextToken();
 				switch (t) {
 				case '=':
-					System.out.println("==");
+					printOperator("==");
 					break;
 				default:
 					st.pushBack();
-					System.out.println("=");
+					printOperator("=");
 					break;
 				}
 			}
@@ -63,19 +60,23 @@ public class Test {
 				int t = st.nextToken();
 				switch (t) {
 				case '=':
-					System.out.println(">=");
+					printOperator(">=");
 					break;
 				case '<':
-					System.out.println(">>");
+					printOperator(">>");
 					break;
 				default:
 					st.pushBack();
-					System.out.println(">");
+					printOperator(">");
 					break;
 				}
 			}
 			}
 			currentToken = st.nextToken();
 		}
+	}
+	
+	private static void printOperator(String operator) {
+		System.out.printf("[Relational_Op, %s]\n", operator);
 	}
 }
