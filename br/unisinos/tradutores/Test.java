@@ -1,15 +1,26 @@
 package br.unisinos.tradutores;
 
+import java.io.BufferedReader;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.io.IOException;
 import java.io.Reader;
 import java.io.StreamTokenizer;
-import java.io.StringReader;
+import java.util.ArrayList;
+import java.util.List;
 
 public class Test {
 
 	public static void main(String[] args) throws IOException {
-		Reader r = new StringReader("/*abc*/if(x == 7 + 5) \n abc ;//oi");
-		StreamTokenizer st = new StreamTokenizer(r);
+		Reader reader = readFile("./br/unisinos//tradutores//InputCode.txt");
+		BufferedReader br = readFile("./br/unisinos//tradutores//ReservedWords.csv");
+		String line = null;
+		List<String> reservedWords = new ArrayList<String>();
+		while ((line = br.readLine()) != null) {
+			reservedWords.add(line.replace(",", ""));
+		}
+
+		StreamTokenizer st = new StreamTokenizer(reader);
 		st.slashSlashComments(true);
 		st.slashStarComments(true);
 		st.eolIsSignificant(true);
@@ -21,7 +32,7 @@ public class Test {
 				break;
 			case StreamTokenizer.TT_WORD:
 				String word = st.sval;
-				System.out.printf("[string_literal, %s]", word);
+				printReservedWord(word, reservedWords);
 				break;
 			case '+':
 			case '-':
@@ -72,14 +83,25 @@ public class Test {
 				}
 			}
 			}
-			if(currentToken == StreamTokenizer.TT_EOL) {
+			if (currentToken == StreamTokenizer.TT_EOL) {
 				System.out.println();
 			}
 			currentToken = st.nextToken();
 		}
 	}
-	
+
 	private static void printOperator(String operator) {
 		System.out.printf("[Relational_Op, %s]", operator);
+	}
+
+	private static BufferedReader readFile(String path) throws FileNotFoundException {
+		return new BufferedReader(new FileReader(path));
+	}
+
+	private static void printReservedWord(String value, List<String> reservedWords) {
+		if (reservedWords.contains(value))
+			System.out.printf("[reserved_word, %s]", value);
+		else
+			System.out.printf("[string_literal, %s]", value);
 	}
 }
