@@ -25,6 +25,7 @@ public class Test {
 		st.slashStarComments(true);
 		st.eolIsSignificant(true);
 		int currentToken = st.nextToken();
+		int scopeCount = 0;
 		while (currentToken != StreamTokenizer.TT_EOF) {
 			switch (currentToken) {
 			case StreamTokenizer.TT_NUMBER:
@@ -32,7 +33,7 @@ public class Test {
 				break;
 			case StreamTokenizer.TT_WORD:
 				String word = st.sval;
-				printReservedWord(word, reservedWords);
+				printTTWord(word, reservedWords, scopeCount);
 				break;
 			case '+':
 			case '-':
@@ -63,7 +64,7 @@ public class Test {
 					break;
 				default:
 					st.pushBack();
-					printOperator("=");
+					System.out.printf("[equal, %c]", currentToken);
 					break;
 				}
 			}
@@ -82,6 +83,24 @@ public class Test {
 					break;
 				}
 			}
+			case '{':
+				System.out.printf("[l_bracket, %c]", currentToken);
+				break;
+			case '}':
+				System.out.printf("[r_bracket, %c]", currentToken);
+				break;
+			case '(':
+				System.out.printf("[l_paren, %c]", currentToken);
+				break;
+			case ')':
+				System.out.printf("[r_paren, %c]", currentToken);
+				break;
+			case ',':
+				System.out.printf("[comma, %c]", currentToken);
+				break;
+			case ';':
+				System.out.printf("[semicolon, %c]", currentToken);
+				break;
 			}
 			if (currentToken == StreamTokenizer.TT_EOL) {
 				System.out.println();
@@ -98,10 +117,11 @@ public class Test {
 		return new BufferedReader(new FileReader(path));
 	}
 
-	private static void printReservedWord(String value, List<String> reservedWords) {
+	private static void printTTWord(String value, List<String> reservedWords, int count) {
 		if (reservedWords.contains(value))
 			System.out.printf("[reserved_word, %s]", value);
 		else
 			System.out.printf("[string_literal, %s]", value);
 	}
+
 }
