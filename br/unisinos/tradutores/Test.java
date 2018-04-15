@@ -99,6 +99,17 @@ public class Test {
 					break;
 				}
 			}
+			case '!': {
+				int t = st.nextToken();
+				switch (t) {
+				case '=':
+					printOperator("!=");
+					break;
+				default:
+					st.pushBack();
+					break;
+				}
+			}
 			case '&': {
 				int t = st.nextToken();
 				switch (t) {
