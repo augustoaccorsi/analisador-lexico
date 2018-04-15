@@ -42,22 +42,22 @@ public class Test {
 				System.out.printf("[Arith_Op, %c]", currentToken);
 				break;
 			case '{':
-				System.out.printf("[l_bracket, %c]", currentToken);
+				printOtherCharacters("l_bracket", currentToken);
 				break;
 			case '}':
-				System.out.printf("[r_bracket, %c]", currentToken);
+				printOtherCharacters("r_bracket", currentToken);
 				break;
 			case '(':
-				System.out.printf("[l_paren, %c]", currentToken);
+				printOtherCharacters("l_paren", currentToken);
 				break;
 			case ')':
-				System.out.printf("[r_paren, %c]", currentToken);
+				printOtherCharacters("r_paren", currentToken);
 				break;
 			case ',':
-				System.out.printf("[comma, %c]", currentToken);
+				printOtherCharacters("comma", currentToken);
 				break;
 			case ';':
-				System.out.printf("[semicolon, %c]", currentToken);
+				printOtherCharacters("semicolon", currentToken);
 				break;
 			case '<': {
 				int t = st.nextToken();
@@ -145,6 +145,10 @@ public class Test {
 			System.out.printf("[reserved_word, %s]", value);
 		else
 			System.out.printf("[string_literal, %s]", value);
+	}
+
+	private static void printOtherCharacters(String token, int value) {
+		System.out.printf("[" + token + ", %c]", value);
 	}
 
 }
