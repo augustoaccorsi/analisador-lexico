@@ -41,6 +41,24 @@ public class Test {
 			case '*':
 				System.out.printf("[Arith_Op, %c]", currentToken);
 				break;
+			case '{':
+				System.out.printf("[l_bracket, %c]", currentToken);
+				break;
+			case '}':
+				System.out.printf("[r_bracket, %c]", currentToken);
+				break;
+			case '(':
+				System.out.printf("[l_paren, %c]", currentToken);
+				break;
+			case ')':
+				System.out.printf("[r_paren, %c]", currentToken);
+				break;
+			case ',':
+				System.out.printf("[comma, %c]", currentToken);
+				break;
+			case ';':
+				System.out.printf("[semicolon, %c]", currentToken);
+				break;
 			case '<': {
 				int t = st.nextToken();
 				switch (t) {
@@ -52,7 +70,6 @@ public class Test {
 					break;
 				default:
 					st.pushBack();
-					printOperator("<");
 					break;
 				}
 			}
@@ -74,33 +91,36 @@ public class Test {
 				case '=':
 					printOperator(">=");
 					break;
-				case '<':
+				case '>':
 					printOperator(">>");
 					break;
 				default:
 					st.pushBack();
-					printOperator(">");
 					break;
 				}
 			}
-			case '{':
-				System.out.printf("[l_bracket, %c]", currentToken);
-				break;
-			case '}':
-				System.out.printf("[r_bracket, %c]", currentToken);
-				break;
-			case '(':
-				System.out.printf("[l_paren, %c]", currentToken);
-				break;
-			case ')':
-				System.out.printf("[r_paren, %c]", currentToken);
-				break;
-			case ',':
-				System.out.printf("[comma, %c]", currentToken);
-				break;
-			case ';':
-				System.out.printf("[semicolon, %c]", currentToken);
-				break;
+			case '&': {
+				int t = st.nextToken();
+				switch (t) {
+				case '&':
+					printOperator("&&");
+					break;
+				default:
+					st.pushBack();
+					break;
+				}
+			}
+			case '|': {
+				int t = st.nextToken();
+				switch (t) {
+				case '|':
+					printOperator("||");
+					break;
+				default:
+					st.pushBack();
+					break;
+				}
+			}
 			}
 			if (currentToken == StreamTokenizer.TT_EOL) {
 				System.out.println();
@@ -110,7 +130,10 @@ public class Test {
 	}
 
 	private static void printOperator(String operator) {
-		System.out.printf("[Relational_Op, %s]", operator);
+		if (operator.equals("&&") || operator.equals("||"))
+			System.out.printf("[logic_op, %s]", operator);
+		else
+			System.out.printf("[Relational_Op, %s]", operator);
 	}
 
 	private static BufferedReader readFile(String path) throws FileNotFoundException {
