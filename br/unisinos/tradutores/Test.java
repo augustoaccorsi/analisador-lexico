@@ -7,9 +7,14 @@ import java.io.IOException;
 import java.io.Reader;
 import java.io.StreamTokenizer;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class Test {
+	
+	static int identifierCount = 0;
+	static Map<String, Integer> identifiers = new HashMap<String, Integer>();
 
 	public static void main(String[] args) throws IOException {
 		Reader reader = readFile("./br/unisinos//tradutores//InputCode.txt");
@@ -24,119 +29,145 @@ public class Test {
 		st.slashSlashComments(true);
 		st.slashStarComments(true);
 		st.eolIsSignificant(true);
+		st.ordinaryChar('/');
 		int currentToken = st.nextToken();
-		int scopeCount = 0;
 		while (currentToken != StreamTokenizer.TT_EOF) {
 			switch (currentToken) {
-			case StreamTokenizer.TT_NUMBER:
-				System.out.printf("[num, %s]", st.nval);
-				break;
-			case StreamTokenizer.TT_WORD:
-				String word = st.sval;
-				printTTWord(word, reservedWords, scopeCount);
-				break;
-			case '+':
-			case '-':
-			case '/':
-			case '*':
-				System.out.printf("[Arith_Op, %c]", currentToken);
-				break;
-			case '{':
-				printOtherCharacters("l_bracket", currentToken);
-				break;
-			case '}':
-				printOtherCharacters("r_bracket", currentToken);
-				break;
-			case '(':
-				printOtherCharacters("l_paren", currentToken);
-				break;
-			case ')':
-				printOtherCharacters("r_paren", currentToken);
-				break;
-			case ',':
-				printOtherCharacters("comma", currentToken);
-				break;
-			case ';':
-				printOtherCharacters("semicolon", currentToken);
-				break;
-			case '<': {
-				int t = st.nextToken();
-				switch (t) {
-				case '=':
-					printOperator("<=");
+				case StreamTokenizer.TT_NUMBER:
+					System.out.printf("[num, %s]", st.nval);
 					break;
-				case '<':
-					printOperator("<<");
+				case StreamTokenizer.TT_WORD:
+					String word = st.sval;
+					if(reservedWords.contains(word))
+						printReservedWord(word);
+					else
+						printIdentifier(word);
 					break;
-				default:
-					st.pushBack();
+				case '+':
+				case '-':
+				case '/':					
+				case '*':
+					System.out.printf("[Arith_Op, %c]", currentToken);
 					break;
-				}
-			}
-			case '=': {
-				int t = st.nextToken();
-				switch (t) {
-				case '=':
-					printOperator("==");
+				case '{':
+					printOtherCharacters("l_bracket", currentToken);
 					break;
-				default:
-					st.pushBack();
-					System.out.printf("[equal, %c]", currentToken);
+				case '}':
+					printOtherCharacters("r_bracket", currentToken);
+					break;
+				case '(':
+					printOtherCharacters("l_paren", currentToken);
+					break;
+				case ')':
+					printOtherCharacters("r_paren", currentToken);
+					break;
+				case ',':
+					printOtherCharacters("comma", currentToken);
+					break;
+				case ';':
+					printOtherCharacters("semicolon", currentToken);
+					break;
+				case '<': {
+					int t = st.nextToken();
+					switch (t) {
+					case '=':
+						printOperator("<=");
+						break;
+					case '<':
+						printOperator("<<");
+						break;
+					default:
+						st.pushBack();
+						printOperator("<");
+						break;
+					}
 					break;
 				}
-			}
-			case '>': {
-				int t = st.nextToken();
-				switch (t) {
-				case '=':
-					printOperator(">=");
-					break;
-				case '>':
-					printOperator(">>");
-					break;
-				default:
-					st.pushBack();
-					break;
-				}
-			}
-			case '!': {
-				int t = st.nextToken();
-				switch (t) {
-				case '=':
-					printOperator("!=");
-					break;
-				default:
-					st.pushBack();
+				case '=': {
+					int t = st.nextToken();
+					switch (t) {
+						case '=':
+							printOperator("==");
+							break;
+						default:
+							st.pushBack();
+							System.out.printf("[equal, %c]", currentToken);
+							break;
+					}
 					break;
 				}
-			}
-			case '&': {
-				int t = st.nextToken();
-				switch (t) {
-				case '&':
-					printOperator("&&");
-					break;
-				default:
-					st.pushBack();
-					break;
-				}
-			}
-			case '|': {
-				int t = st.nextToken();
-				switch (t) {
-				case '|':
-					printOperator("||");
-					break;
-				default:
-					st.pushBack();
+				case '>': {
+					int t = st.nextToken();
+					switch (t) {
+					case '=':
+						printOperator(">=");
+						break;
+					case '>':
+						printOperator(">>");
+						break;
+					default:
+						st.pushBack();
+						printOperator(">");
+						break;
+					}
 					break;
 				}
-			}
+				case '!': {
+					int t = st.nextToken();
+					switch (t) {
+					case '=':
+						printOperator("!=");
+						break;
+					default:
+						st.pushBack();
+						break;
+					}
+					break;
+				}
+				case '&': {
+					int t = st.nextToken();
+					switch (t) {
+					case '&':
+						printOperator("&&");
+						break;
+					default:
+						st.pushBack();
+						printOperator("&");
+						break;
+					}
+				}
+				case '|': {
+					int t = st.nextToken();
+					switch (t) {
+					case '|':
+						printOperator("||");
+						break;
+					default:
+						st.pushBack();
+						break;
+					}
+					break;
+				}
+				case '"': {
+					printStringLiteral(st.sval);
+					break;
+				}
 			}
 			if (currentToken == StreamTokenizer.TT_EOL) {
+//				System.out.print("\n" + st.lineno() + " -> ");
 				System.out.println();
 			}
 			currentToken = st.nextToken();
+		}
+	}
+
+	private static void printIdentifier(String word) {
+		if(identifiers.get(word) != null) {
+			System.out.printf("[Id, %s]", identifiers.get(word));
+		} else {
+			identifierCount++;
+			identifiers.put(word, identifierCount);
+			System.out.printf("[Id, %s]", identifierCount);
 		}
 	}
 
@@ -151,11 +182,12 @@ public class Test {
 		return new BufferedReader(new FileReader(path));
 	}
 
-	private static void printTTWord(String value, List<String> reservedWords, int count) {
-		if (reservedWords.contains(value))
-			System.out.printf("[reserved_word, %s]", value);
-		else
-			System.out.printf("[string_literal, %s]", value);
+	private static void printStringLiteral(String value) {
+		System.out.printf("[string_literal, %s]", value);
+	}
+
+	private static void printReservedWord(String value) {
+		System.out.printf("[reserved_word, %s]", value);
 	}
 
 	private static void printOtherCharacters(String token, int value) {
