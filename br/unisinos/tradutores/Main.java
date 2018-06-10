@@ -11,7 +11,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class Test {
+public class Main {
 	
 	static int identifierCount = 0;
 	static Map<String, Integer> identifiers = new HashMap<String, Integer>();
