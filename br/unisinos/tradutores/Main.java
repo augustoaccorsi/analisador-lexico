@@ -163,6 +163,7 @@ public class Main {
 			}	
 			if (token != null) {
 				System.out.print(token.toString());
+				tokenList.add(token);
 				token = null;
 			}
 
