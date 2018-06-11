@@ -19,10 +19,12 @@ public class Main {
 	public static void main(String[] args) throws IOException {
 		Reader reader = readFile("./br/unisinos//tradutores//InputCode.txt");
 		BufferedReader br = readFile("./br/unisinos//tradutores//ReservedWords.csv");
+		
 		String line = null;
 		Token token = null;
 		List<Token> tokenList = new ArrayList<Token>();
 		List<String> reservedWords = new ArrayList<String>();
+		
 		while ((line = br.readLine()) != null) {
 			reservedWords.add(line.replace(",", ""));
 		}
@@ -34,131 +36,8 @@ public class Main {
 		st.ordinaryChar('/');
 		int currentToken = st.nextToken();
 		while (currentToken != StreamTokenizer.TT_EOF) {
-			switch (currentToken) {
-			case StreamTokenizer.TT_NUMBER:
-				token = new Token(Types.num, String.valueOf(st.nval));
-				break;
-			case StreamTokenizer.TT_WORD:
-				String word = st.sval;
-				if (reservedWords.contains(word))
-					token = new Token(Types.reserved_word, word);
-				else {
-					token = getIdentifier(word);
-				}
-				break;
-			case '+':
-			case '-':
-			case '/':
-			case '*':
-				token = new Token(Types.Arith_Op, Character.toString((char) currentToken));
-				break;
-			case '{':
-				token = new Token(Types.l_bracket, Character.toString((char) currentToken));
-				break;
-			case '}':
-				token = new Token(Types.r_bracket, Character.toString((char) currentToken));
-				break;
-			case '(':
-				token = new Token(Types.l_paren, Character.toString((char) currentToken));
-				break;
-			case ')':
-				token = new Token(Types.r_paren, Character.toString((char) currentToken));
-				break;
-			case ',':
-				token = new Token(Types.comma, Character.toString((char) currentToken));
-				break;
-			case ';':
-				token = new Token(Types.semicolon, Character.toString((char) currentToken));
-				break;
-			case '<': {
-				int t = st.nextToken();
-				switch (t) {
-				case '=':
-					token = new Token(Types.Relational_Op, "<=");
-					break;
-				case '<':
-					token = new Token(Types.Relational_Op, "<<");
-					break;
-				default:
-					st.pushBack();
-					token = new Token(Types.Relational_Op, "<");
-					break;
-				}
-				break;
-			}
-			case '=': {
-				int t = st.nextToken();
-				switch (t) {
-				case '=':
-					token = new Token(Types.Relational_Op, "==");
-					break;
-				default:
-					st.pushBack();
-					token = new Token(Types.equal, Character.toString((char) currentToken));
-					break;
-				}
-				break;
-			}
-			case '>': {
-				int t = st.nextToken();
-				switch (t) {
-				case '=':
-					token = new Token(Types.Relational_Op, ">=");
-					break;
-				case '>':
-					token = new Token(Types.Relational_Op, ">>");
-					break;
-				default:
-					st.pushBack();
-					token = new Token(Types.Relational_Op, ">");
-					break;
-				}
-				break;
-			}
-			case '!': {
-				int t = st.nextToken();
-				switch (t) {
-				case '=':
-					token = new Token(Types.Relational_Op, "!=");
-					break;
-				default:
-					st.pushBack();
-					break;
-				}
-				break;
-			}
-			case '&': {
-				int t = st.nextToken();
-				switch (t) {
-				case '&':
-					token = new Token(Types.logic_op, "&&");
-					break;
-				default:
-					st.pushBack();
-					token = new Token(Types.Relational_Op, "&");
-					break;
-				}
-			}
-			case '|': {
-				int t = st.nextToken();
-				switch (t) {
-				case '|':
-					token = new Token(Types.logic_op, "||");
-					break;
-				default:
-					st.pushBack();
-					break;
-				}
-				break;
-			}
-			case '"': {
-				String value = st.sval;
-				token = new Token(Types.string_literal, value);
-				break;
-			}
-			}
+			token = findToken(token, reservedWords, st, currentToken);
 			if (currentToken == StreamTokenizer.TT_EOL) {
-				// System.out.print("\n" + st.lineno() + " -> ");
 				System.out.println();
 			}	
 			if (token != null) {
@@ -169,6 +48,136 @@ public class Main {
 
 			currentToken = st.nextToken();
 		}
+		
+		//aqui teremos os tokens 
+	}
+
+	private static Token findToken(Token token, List<String> reservedWords, StreamTokenizer st, int currentToken)
+			throws IOException {
+		switch (currentToken) {
+		case StreamTokenizer.TT_NUMBER:
+			token = new Token(Types.num, String.valueOf(st.nval));
+			break;
+		case StreamTokenizer.TT_WORD:
+			String word = st.sval;
+			if (reservedWords.contains(word))
+				token = new Token(Types.reserved_word, word);
+			else {
+				token = getIdentifier(word);
+			}
+			break;
+		case '+':
+		case '-':
+		case '/':
+		case '*':
+			token = new Token(Types.Arith_Op, Character.toString((char) currentToken));
+			break;
+		case '{':
+			token = new Token(Types.l_bracket, Character.toString((char) currentToken));
+			break;
+		case '}':
+			token = new Token(Types.r_bracket, Character.toString((char) currentToken));
+			break;
+		case '(':
+			token = new Token(Types.l_paren, Character.toString((char) currentToken));
+			break;
+		case ')':
+			token = new Token(Types.r_paren, Character.toString((char) currentToken));
+			break;
+		case ',':
+			token = new Token(Types.comma, Character.toString((char) currentToken));
+			break;
+		case ';':
+			token = new Token(Types.semicolon, Character.toString((char) currentToken));
+			break;
+		case '<': {
+			int t = st.nextToken();
+			switch (t) {
+			case '=':
+				token = new Token(Types.Relational_Op, "<=");
+				break;
+			case '<':
+				token = new Token(Types.Relational_Op, "<<");
+				break;
+			default:
+				st.pushBack();
+				token = new Token(Types.Relational_Op, "<");
+				break;
+			}
+			break;
+		}
+		case '=': {
+			int t = st.nextToken();
+			switch (t) {
+			case '=':
+				token = new Token(Types.Relational_Op, "==");
+				break;
+			default:
+				st.pushBack();
+				token = new Token(Types.equal, Character.toString((char) currentToken));
+				break;
+			}
+			break;
+		}
+		case '>': {
+			int t = st.nextToken();
+			switch (t) {
+			case '=':
+				token = new Token(Types.Relational_Op, ">=");
+				break;
+			case '>':
+				token = new Token(Types.Relational_Op, ">>");
+				break;
+			default:
+				st.pushBack();
+				token = new Token(Types.Relational_Op, ">");
+				break;
+			}
+			break;
+		}
+		case '!': {
+			int t = st.nextToken();
+			switch (t) {
+			case '=':
+				token = new Token(Types.Relational_Op, "!=");
+				break;
+			default:
+				st.pushBack();
+				break;
+			}
+			break;
+		}
+		case '&': {
+			int t = st.nextToken();
+			switch (t) {
+			case '&':
+				token = new Token(Types.logic_op, "&&");
+				break;
+			default:
+				st.pushBack();
+				token = new Token(Types.Relational_Op, "&");
+				break;
+			}
+		}
+		case '|': {
+			int t = st.nextToken();
+			switch (t) {
+			case '|':
+				token = new Token(Types.logic_op, "||");
+				break;
+			default:
+				st.pushBack();
+				break;
+			}
+			break;
+		}
+		case '"': {
+			String value = st.sval;
+			token = new Token(Types.string_literal, value);
+			break;
+		}
+		}
+		return token;
 	}
 
 	private static Token getIdentifier(String word) {
