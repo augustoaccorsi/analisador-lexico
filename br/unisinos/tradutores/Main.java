@@ -51,7 +51,6 @@ public class Main {
 		}
 		
 		SintaticalAnalyses sintatical = new SintaticalAnalyses(tokenList);
-		sintatical.checkErrors();
 		
 		//aqui teremos os tokens 
 	}

@@ -21,4 +21,6 @@ Print,
 ReadInteger,
 ReadLine,
 def,
+false,
+true,
 continue
