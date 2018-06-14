@@ -288,7 +288,7 @@ public class SintaticalAnalyses {
 			token = tokens.remove(0);
 			if (token.getType() == Types.l_paren) {
 				token = tokens.remove(0);
-				argList(token) //só opcinalmete, logo se n existir ele retorna false false antes e n joga erro
+				argList(token); //só opcinalmete, logo se n existir ele retorna false false antes e n joga erro
 				token = tokens.remove(0);
 				if(token.getType() != Types.l_paren)
 					throwError(token);
