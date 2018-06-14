@@ -41,13 +41,17 @@ public class Main {
 				System.out.println();
 			}	
 			if (token != null) {
-				System.out.print(token.toString());
+			//	System.out.print(token.toString());
+				token.setLine(st.lineno());
 				tokenList.add(token);
 				token = null;
 			}
 
 			currentToken = st.nextToken();
 		}
+		
+		SintaticalAnalyses sintatical = new SintaticalAnalyses(tokenList);
+		sintatical.checkErrors();
 		
 		//aqui teremos os tokens 
 	}

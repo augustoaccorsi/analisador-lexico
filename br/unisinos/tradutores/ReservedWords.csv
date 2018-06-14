@@ -19,5 +19,6 @@ new,
 NewArray,
 Print,
 ReadInteger,
-ReadLine
-     
+ReadLine,
+def,
+continue
