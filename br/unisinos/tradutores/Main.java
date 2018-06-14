@@ -76,11 +76,17 @@ public class Main {
 		case '*':
 			token = new Token(Types.Arith_Op, Character.toString((char) currentToken));
 			break;
-		case '{':
+		case '[':
 			token = new Token(Types.l_bracket, Character.toString((char) currentToken));
 			break;
-		case '}':
+		case ']':
 			token = new Token(Types.r_bracket, Character.toString((char) currentToken));
+			break;
+		case '{':
+			token = new Token(Types.l_braces, Character.toString((char) currentToken));
+			break;
+		case '}':
+			token = new Token(Types.r_braces, Character.toString((char) currentToken));
 			break;
 		case '(':
 			token = new Token(Types.l_paren, Character.toString((char) currentToken));
