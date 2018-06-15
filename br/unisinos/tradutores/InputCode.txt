@@ -1,5 +1,16 @@
-int a;
+def int foo(int a, int b, int c) {
+  return a + 2;
+}
 
-def void abc() {
-	a = 3;
+def void main() {
+  int b;
+  int a;
+  double d;
+
+  d = d + d * 4 - (6 / 5);
+  b = ReadInteger();
+  a = b + 2;
+  Print(a, b, d);
+  foo(a, d, false);
+  foo(a + 2, d/2, a == b && d >= 1.0);
 }

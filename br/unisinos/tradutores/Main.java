@@ -50,7 +50,8 @@ public class Main {
 			currentToken = st.nextToken();
 		}
 		
-		SintaticalAnalyses sintatical = new SintaticalAnalyses(tokenList);
+		SintaticalAnalyses sintatical = new SintaticalAnalyses(tokenList, reservedWords);
+	
 		
 		//aqui teremos os tokens 
 	}

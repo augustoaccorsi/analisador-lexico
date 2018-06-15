@@ -6,18 +6,29 @@ public class SintaticalAnalyses {
 	private List<Token> tokens = null;
 	private Token tok;
 	private int index;
+	private List<String> reservedWords = null;
 
-	public SintaticalAnalyses(List<Token> tokens) {
+	public SintaticalAnalyses(List<Token> tokens, List<String> reservedWords) {
 		this.tokens = tokens;
 		this.index = 0;
+		this.reservedWords = reservedWords;
 		getNext();
-		this.program();
+		try {
+			this.program();
+		} catch (Exception e) {
+			throwError(tok);
+		}
 		System.out.println("Success!");
 	}
+	
+//	private boolean isReserverdWord() {
+//		
+//	}
 
 	private void getNext() {
-		if(index == tokens.size()) {
-			throwError(tok);
+		if (index == tokens.size()) {
+			tok = null;
+			return;
 		}
 		tok = tokens.get(index);
 		index++;
@@ -31,7 +42,9 @@ public class SintaticalAnalyses {
 	}
 
 	private void throwError(Token tok) {
+		tok = tokens.get(index - 2);
 		System.out.println("error on line " + tok.getLine() + "");
+		System.out.println(tok);
 		System.exit(0);
 	}
 
@@ -105,7 +118,7 @@ public class SintaticalAnalyses {
 
 	private void block() {
 		consume("{");
-		while (tok.getType() != Types.l_braces) {
+		while (tok != null && tok.getType() != Types.r_braces) {
 			if (isStatement() == true) {
 				statement();
 			} else {
@@ -117,11 +130,17 @@ public class SintaticalAnalyses {
 
 	private void statement() {
 		if (tok.getType() == Types.Id) {
-			consume(tok.getValue());
-			if (tok.getValue().equals("("))
+			if (tokens.get(index).getValue().equals("(")) {
 				funcCall();
-			else
+				consume(";");
+			}
+
+			else {
 				loc();
+				consume("=");
+				expression();
+				consume(";");
+			}
 		} else {
 			switch (tok.getValue()) {
 			case "if":
@@ -164,17 +183,24 @@ public class SintaticalAnalyses {
 	private void expression() {
 		if (isLiteral() == true) {
 			literal();
+			if (tok.getType() == Types.Relational_Op || tok.getType() == Types.equal
+					|| tok.getType() == Types.Arith_Op) {
+				consume(tok.getValue());
+				expression();
+			}
 		} else if (tok.getType() == Types.Id) {
-			consume(tok.getValue());
-			if (tok.getValue().equals("(")) {
+			// consume(tok.getValue());
+			if (tokens.get(index).getValue().equals("(")) {
 				funcCall();
-				if (tok.getType() == Types.Relational_Op  || tok.getType() == Types.equal) {
+				if (tok.getType() == Types.Relational_Op || tok.getType() == Types.equal
+						|| tok.getType() == Types.Arith_Op) {
 					consume(tok.getValue());
 					expression();
 				}
 			} else {
 				loc();
-				if (tok.getType() == Types.Relational_Op || tok.getType() == Types.equal) {
+				if (tok.getType() == Types.Relational_Op || tok.getType() == Types.equal
+						|| tok.getType() == Types.Arith_Op) {
 					consume(tok.getValue());
 					expression();
 				}
@@ -198,6 +224,25 @@ public class SintaticalAnalyses {
 					expression();
 				}
 				break;
+			case reserved_word:{
+				switch (tok.getValue()) {
+				case "NewArray":
+				case "Print":
+				case "ReadInteger":
+				case "ReadLine":
+					consume(tok.getValue());
+					consume("(");
+					if (isExpression() == true)
+						argList();
+					consume(")");
+					//consume(";");
+					break;
+				default:
+					throwError(tok);
+					break;
+				}
+				break;
+			}
 			default:
 				throwError(tok);
 			}
@@ -232,9 +277,17 @@ public class SintaticalAnalyses {
 		case "void":
 			consume("void");
 			break;
-		case "boolean":
-			consume("boolean");
+		case "bool":
+			consume("bool");
 			break;
+		case "double":
+			consume("double");
+			break;
+		case "string":
+			consume("string");
+			break;
+		default:
+			throwError(tok);
 		}
 	}
 
@@ -260,7 +313,7 @@ public class SintaticalAnalyses {
 			consume(tok.getValue());
 			break;
 		case reserved_word:
-			if(tok.getValue().equals("true") || tok.getValue().equals("false"))
+			if (tok.getValue().equals("true") || tok.getValue().equals("false"))
 				consume(tok.getValue());
 			break;
 		default:
@@ -295,7 +348,7 @@ public class SintaticalAnalyses {
 		case string_literal:
 			return true;
 		case reserved_word:
-			if(tok.getValue().equals("true") || tok.getValue().equals("false"))
+			if (tok.getValue().equals("true") || tok.getValue().equals("false"))
 				return true;
 		default:
 			return false;
@@ -311,10 +364,10 @@ public class SintaticalAnalyses {
 			return true;
 		case l_paren:
 			return true;
-		default:
-			throwError(tok);
+		case num:
+			return true;
 		}
-		
+
 		if (isLiteral() == true)
 			return true;
 		return false;
