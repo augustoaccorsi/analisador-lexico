@@ -20,10 +20,10 @@ public class SintaticalAnalyses {
 		}
 		System.out.println("Success!");
 	}
-	
-//	private boolean isReserverdWord() {
-//		
-//	}
+
+	// private boolean isReserverdWord() {
+	//
+	// }
 
 	private void getNext() {
 		if (index == tokens.size()) {
@@ -31,6 +31,10 @@ public class SintaticalAnalyses {
 			return;
 		}
 		tok = tokens.get(index);
+		if (tok.getValue().equals("1")) {
+			int a;
+			a = 2;
+		}
 		index++;
 	}
 
@@ -175,6 +179,50 @@ public class SintaticalAnalyses {
 				consume("continue");
 				consume(";");
 				break;
+			case "Print":
+				consume("Print");
+				consume("(");
+				argList();
+				consume(")");
+				consume(";");
+				break;
+			case "ReadLine":
+				consume("ReadLine");
+				consume("(");
+				consume(")");
+				consume(";");
+				break;
+			case "ReadInteger":
+				consume("ReadInteger");
+				consume("(");
+				consume(")");
+				consume(";");
+				break;
+			case "NewArray":
+				consume("NewArray");
+				consume("(");
+				expression();
+				consume(",");
+				type();
+				if (tok.getValue().equals("[")) {
+					consume("[");
+					num(tok);
+					consume("]");
+				}
+				consume(")");
+				consume(";");
+				break;
+			case "New":
+				consume("New");
+				consume("(");
+				if (tok.getType() == Types.Id) {
+					consume(tok.getValue());
+				} else {
+					throwError(tok);
+				}
+				consume(")");
+				consume(";");
+				break;
 			}
 		}
 
@@ -183,8 +231,8 @@ public class SintaticalAnalyses {
 	private void expression() {
 		if (isLiteral() == true) {
 			literal();
-			if (tok.getType() == Types.Relational_Op || tok.getType() == Types.equal
-					|| tok.getType() == Types.Arith_Op) {
+			if (tok.getType() == Types.Relational_Op || tok.getType() == Types.equal || tok.getType() == Types.Arith_Op
+					|| tok.getType() == Types.logic_op) {
 				consume(tok.getValue());
 				expression();
 			}
@@ -193,14 +241,14 @@ public class SintaticalAnalyses {
 			if (tokens.get(index).getValue().equals("(")) {
 				funcCall();
 				if (tok.getType() == Types.Relational_Op || tok.getType() == Types.equal
-						|| tok.getType() == Types.Arith_Op) {
+						|| tok.getType() == Types.Arith_Op || tok.getType() == Types.logic_op) {
 					consume(tok.getValue());
 					expression();
 				}
 			} else {
 				loc();
 				if (tok.getType() == Types.Relational_Op || tok.getType() == Types.equal
-						|| tok.getType() == Types.Arith_Op) {
+						|| tok.getType() == Types.Arith_Op || tok.getType() == Types.logic_op) {
 					consume(tok.getValue());
 					expression();
 				}
@@ -224,7 +272,7 @@ public class SintaticalAnalyses {
 					expression();
 				}
 				break;
-			case reserved_word:{
+			case reserved_word: {
 				switch (tok.getValue()) {
 				case "NewArray":
 				case "Print":
@@ -235,7 +283,7 @@ public class SintaticalAnalyses {
 					if (isExpression() == true)
 						argList();
 					consume(")");
-					//consume(";");
+					// consume(";");
 					break;
 				default:
 					throwError(tok);
@@ -335,6 +383,14 @@ public class SintaticalAnalyses {
 			case "break":
 				return true;
 			case "continue":
+				return true;
+			case "Print":
+				return true;
+			case "ReadInteger":
+				return true;
+			case "ReadLine":
+				return true;
+			case "NewArray":
 				return true;
 			}
 		}

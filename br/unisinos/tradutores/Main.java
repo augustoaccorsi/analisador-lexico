@@ -37,9 +37,6 @@ public class Main {
 		int currentToken = st.nextToken();
 		while (currentToken != StreamTokenizer.TT_EOF) {
 			token = findToken(token, reservedWords, st, currentToken);
-			if (currentToken == StreamTokenizer.TT_EOL) {
-				System.out.println();
-			}	
 			if (token != null) {
 			//	System.out.print(token.toString());
 				token.setLine(st.lineno());
